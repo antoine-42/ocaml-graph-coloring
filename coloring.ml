@@ -43,9 +43,9 @@ let init_colors graph n =
   StringMap.map (fun set -> color_set n) graph (* Pour tous les sommets du graphe, creer un set contenant les entiers de 1 a n. *)
 
 (* 8 *)
-let remove_color i vertex color_map =
+let remove_color color vertex color_map =
   let set = StringMap.find vertex color_map in (* Trouver l'ensemble qui contient les couleurs disponibles du sommet. *)
-  StringMap.add vertex (IntSet.remove i set) color_map (* Enlever i de l'ensemble qui contient les couleurs disponibles du sommet. *)
+  StringMap.add vertex (IntSet.remove color set) color_map (* Enlever la couleur des couleurs disponibles du sommet. *)
 
 (* 9 *)
 exception Failed
@@ -70,11 +70,11 @@ let rec color graph colors =
     if IntSet.is_empty vertex_available_colors_set then raise (Failed) else (* Si plus de couleur disponible alors echec. *)
     let curr_color = IntSet.choose vertex_available_colors_set in (* Choisir une couleur parmis les couleurs disponibles. *)
     try
-      let c' = StringMap.mapi (
-        fun curr_neighboor curr_neighboor_colors ->
-        if StringSet.mem curr_neighboor vertex_neighboors
-        then IntSet.remove curr_color curr_neighboor_colors
-        else curr_neighboor_colors ) colors in
+      let c' = StringMap.mapi ( (* Pour toutes les entrees de couleurs disponibles. *)
+        fun curr_vertex' vertex_available_colors_set' ->
+        if StringSet.mem curr_vertex' vertex_neighboors (* Si le sommet actuel est voisin du sommet curr_vertex. *)
+        then IntSet.remove curr_color vertex_available_colors_set' (* Alors enlever la couleur choisie de ses couleurs possibles. *)
+        else vertex_available_colors_set' ) colors in (* Sinon conserver ses couleurs. *)
       let g' = remove_vertex curr_vertex graph in (* Prendre le graphe sans le sommet. *)
       let result = color g' c' in
       StringMap.add curr_vertex curr_color result

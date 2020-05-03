@@ -2,4 +2,4 @@ compile:
 	ocamlopt -o coloring coloring.ml
 
 clean:
-	rm *.cmi *.cmx *.o
+	rm *.cmi *.cmx *.o coloring
