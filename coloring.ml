@@ -65,7 +65,7 @@ type coloring = int StringMap.t
 (* 12 *)
 let rec color graph colors =
   if StringMap.is_empty graph then StringMap.empty else (* Si g est vide retourner le coloriage vide. *)
-  let (curr_vertex, vertex_neighboors) = StringMap.choose graph in (* Sinon choisir un sommet et prendre ses voisins. *)
+  let (curr_vertex, vertex_neighboors) = StringMap.choose graph in (* Sinon choisir un sommet (curr_vertex) et prendre ses voisins. *)
   let rec color_vertex vertex_available_colors_set =
     if IntSet.is_empty vertex_available_colors_set then raise (Failed) else (* Si plus de couleur disponible alors echec. *)
     let curr_color = IntSet.choose vertex_available_colors_set in (* Choisir une couleur parmis les couleurs disponibles. *)
@@ -76,10 +76,9 @@ let rec color graph colors =
         then IntSet.remove curr_color vertex_available_colors_set' (* Alors enlever la couleur choisie de ses couleurs possibles. *)
         else vertex_available_colors_set' ) colors in (* Sinon conserver ses couleurs. *)
       let g' = remove_vertex curr_vertex graph in (* Prendre le graphe sans le sommet. *)
-      let result = color g' c' in
-      StringMap.add curr_vertex curr_color result
+      StringMap.add curr_vertex curr_color (color g' c') (* Appliquer color sur le nouveau graphe et entrees de couleurs disponibles, et ajouter au resultat la couleur choisie du sommet curr_vertex. *)
     with
-      Failed -> color_vertex (IntSet.remove curr_color vertex_available_colors_set)
+      Failed -> color_vertex (IntSet.remove curr_color vertex_available_colors_set) (* Si echec, enlever la couleur choisie des couleurs disponibles de curr_vertex. *)
   in
   let vertex_color_set = StringMap.find curr_vertex colors in (* Prendre son ensemble de couleurs disponibles. *)
   color_vertex vertex_color_set
